@@ -1,6 +1,6 @@
-# Liste des switches pour provisioning VLAN
-# Utilisé par: vlan-provisioner.sh
-# Format: Une IP ou hostname par ligne
+# Switch list for VLAN provisioning
+# Used by: vlan-provisioner.sh
+# Format: One IP or hostname per line
 
 # Core Switches
 192.168.1.1

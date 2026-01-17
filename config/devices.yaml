@@ -1,5 +1,5 @@
-# Configuration des équipements réseau
-# Utilisé par: config-backup.sh
+# Network equipment configuration
+# Used by: config-backup.sh
 
 devices:
   # Core Switches
@@ -71,7 +71,7 @@ devices:
       commands:
         - "show running-config"
 
-# Configuration globale
+# Global settings
 global_settings:
   timeout: 30
   max_retries: 3
