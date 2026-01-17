@@ -1,0 +1,80 @@
+# Configuration des équipements réseau
+# Utilisé par: config-backup.sh
+
+devices:
+  # Core Switches
+  - name: core-switch-01
+    ip: 192.168.1.1
+    type: cisco
+    location: datacenter-room-A
+    credentials:
+      username: admin
+      method: ssh-key
+      key_path: ~/.ssh/netops_rsa
+    backup:
+      enabled: true
+      commands:
+        - "show running-config"
+        - "show startup-config"
+  
+  - name: core-switch-02
+    ip: 192.168.1.2
+    type: cisco
+    location: datacenter-room-B
+    credentials:
+      username: admin
+      method: ssh-key
+      key_path: ~/.ssh/netops_rsa
+    backup:
+      enabled: true
+      commands:
+        - "show running-config"
+        - "show startup-config"
+  
+  # Edge Routers
+  - name: edge-router-01
+    ip: 10.0.0.1
+    type: juniper
+    location: edge-location-1
+    credentials:
+      username: netadmin
+      method: password
+    backup:
+      enabled: true
+      commands:
+        - "show configuration"
+  
+  # Access Switches
+  - name: access-switch-floor1
+    ip: 192.168.1.10
+    type: hp
+    location: building-1-floor-1
+    credentials:
+      username: admin
+      method: ssh-key
+      key_path: ~/.ssh/netops_rsa
+    backup:
+      enabled: true
+      commands:
+        - "show running-config"
+  
+  - name: access-switch-floor2
+    ip: 192.168.1.11
+    type: hp
+    location: building-1-floor-2
+    credentials:
+      username: admin
+      method: ssh-key
+      key_path: ~/.ssh/netops_rsa
+    backup:
+      enabled: true
+      commands:
+        - "show running-config"
+
+# Configuration globale
+global_settings:
+  timeout: 30
+  max_retries: 3
+  backup_retention_days: 90
+  encryption: true
+  git_versioning: true

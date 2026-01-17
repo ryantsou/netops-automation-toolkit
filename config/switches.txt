@@ -1,0 +1,16 @@
+# Liste des switches pour provisioning VLAN
+# Utilisé par: vlan-provisioner.sh
+# Format: Une IP ou hostname par ligne
+
+# Core Switches
+192.168.1.1
+192.168.1.2
+
+# Access Switches - Building 1
+192.168.1.10
+192.168.1.11
+192.168.1.12
+
+# Access Switches - Building 2
+192.168.2.10
+192.168.2.11
