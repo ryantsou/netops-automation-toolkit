@@ -2,7 +2,7 @@
 
 # NetOps Automation Toolkit - Installation Script
 # Author: Riantsoa Rajhonson
-# Description: Installation automatisée du toolkit
+# Description: Automated toolkit installation
 
 set -e
 
@@ -16,14 +16,14 @@ echo -e "${COLOR_GREEN}║  NetOps Automation Toolkit - Installer  ║${COLOR_RE
 echo -e "${COLOR_GREEN}╚═══════════════════════════════════════════╝${COLOR_RESET}"
 echo ""
 
-# Vérifier les prérequis
-echo -e "${COLOR_YELLOW}[1/5]${COLOR_RESET} Vérification des prérequis..."
+# Check prerequisites
+echo -e "${COLOR_YELLOW}[1/5]${COLOR_RESET} Checking prerequisites..."
 
 check_command() {
     if command -v $1 &> /dev/null; then
-        echo -e "  ✓ $1 installé"
+        echo -e "  ✓ $1 installed"
     else
-        echo -e "  ${COLOR_RED}✗ $1 manquant${COLOR_RESET}"
+        echo -e "  ${COLOR_RED}✗ $1 missing${COLOR_RESET}"
         MISSING_DEPS="$MISSING_DEPS $1"
     fi
 }
@@ -37,41 +37,41 @@ check_command nslookup
 check_command netstat
 
 if [ ! -z "$MISSING_DEPS" ]; then
-    echo -e "${COLOR_RED}Erreur: Dépendances manquantes:$MISSING_DEPS${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}Installez-les avec: sudo apt-get install$MISSING_DEPS${COLOR_RESET}"
+    echo -e "${COLOR_RED}Error: Missing dependencies:$MISSING_DEPS${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Install them with: sudo apt-get install$MISSING_DEPS${COLOR_RESET}"
     exit 1
 fi
 
-# Créer les répertoires
-echo -e "${COLOR_YELLOW}[2/5]${COLOR_RESET} Création de la structure des répertoires..."
+# Create directories
+echo -e "${COLOR_YELLOW}[2/5]${COLOR_RESET} Creating directory structure..."
 mkdir -p config/templates
 mkdir -p logs
 mkdir -p reports
 mkdir -p tests
 mkdir -p docs
-echo -e "  ✓ Répertoires créés"
+echo -e "  ✓ Directories created"
 
-# Rendre les scripts exécutables
-echo -e "${COLOR_YELLOW}[3/5]${COLOR_RESET} Configuration des permissions..."
+# Set permissions
+echo -e "${COLOR_YELLOW}[3/5]${COLOR_RESET} Configuring permissions..."
 find scripts -type f -name "*.sh" -exec chmod +x {} \;
-echo -e "  ✓ Permissions configurées"
+echo -e "  ✓ Permissions configured"
 
-# Créer les fichiers de configuration par défaut
-echo -e "${COLOR_YELLOW}[4/5]${COLOR_RESET} Création des fichiers de configuration..."
+# Create default configuration files
+echo -e "${COLOR_YELLOW}[4/5]${COLOR_RESET} Creating configuration files..."
 
 if [ ! -f config/hosts.txt ]; then
     cat > config/hosts.txt <<EOF
-# Liste des hôtes à monitorer
-# Format: IP ou hostname (un par ligne)
+# List of hosts to monitor
+# Format: IP or hostname (one per line)
 8.8.8.8
 1.1.1.1
 EOF
-    echo -e "  ✓ config/hosts.txt créé"
+    echo -e "  ✓ config/hosts.txt created"
 fi
 
 if [ ! -f config/alerts.conf ]; then
     cat > config/alerts.conf <<EOF
-# Configuration des alertes
+# Alert configuration
 EMAIL_ALERT=false
 EMAIL_TO="admin@example.com"
 SLACK_WEBHOOK=""
@@ -79,13 +79,13 @@ ALERT_THRESHOLD_CPU=80
 ALERT_THRESHOLD_MEM=85
 ALERT_THRESHOLD_DISK=90
 EOF
-    echo -e "  ✓ config/alerts.conf créé"
+    echo -e "  ✓ config/alerts.conf created"
 fi
 
-# Ajouter au PATH (optionnel)
-echo -e "${COLOR_YELLOW}[5/5]${COLOR_RESET} Configuration du PATH (optionnel)..."
+# Add to PATH (optional)
+echo -e "${COLOR_YELLOW}[5/5]${COLOR_RESET} Configuring PATH (optional)..."
 echo ""
-echo -e "${COLOR_YELLOW}Voulez-vous ajouter les scripts au PATH? (y/n)${COLOR_RESET}"
+echo -e "${COLOR_YELLOW}Do you want to add scripts to PATH? (y/n)${COLOR_RESET}"
 read -r response
 
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
@@ -103,23 +103,23 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/security\"" >> "$SHELL_RC"
         echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/automation\"" >> "$SHELL_RC"
         echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/reporting\"" >> "$SHELL_RC"
-        echo -e "  ✓ PATH ajouté à $SHELL_RC"
-        echo -e "  ${COLOR_YELLOW}Exécutez: source $SHELL_RC${COLOR_RESET}"
+        echo -e "  ✓ PATH added to $SHELL_RC"
+        echo -e "  ${COLOR_YELLOW}Run: source $SHELL_RC${COLOR_RESET}"
     else
-        echo -e "  ${COLOR_YELLOW}PATH déjà configuré${COLOR_RESET}"
+        echo -e "  ${COLOR_YELLOW}PATH already configured${COLOR_RESET}"
     fi
 else
-    echo -e "  ⊗ PATH non modifié"
+    echo -e "  ⊗ PATH not modified"
 fi
 
 echo ""
 echo -e "${COLOR_GREEN}╔═══════════════════════════════════════════╗${COLOR_RESET}"
-echo -e "${COLOR_GREEN}║     Installation terminée avec succès!   ║${COLOR_RESET}"
+echo -e "${COLOR_GREEN}║     Installation completed successfully!   ║${COLOR_RESET}"
 echo -e "${COLOR_GREEN}╚═══════════════════════════════════════════╝${COLOR_RESET}"
 echo ""
-echo -e "${COLOR_YELLOW}Prochaines étapes:${COLOR_RESET}"
-echo "  1. Éditer les fichiers de configuration dans config/"
-echo "  2. Tester un script: ./scripts/monitoring/bandwidth-monitor.sh --help"
-echo "  3. Consulter la documentation: cat README.md"
+echo -e "${COLOR_YELLOW}Next steps:${COLOR_RESET}"
+echo "  1. Edit configuration files in config/"
+echo "  2. Test a script: ./scripts/monitoring/bandwidth-monitor.sh --help"
+echo "  3. Read documentation: cat README.md"
 echo ""
 echo -e "${COLOR_GREEN}Happy networking! 🚀${COLOR_RESET}"

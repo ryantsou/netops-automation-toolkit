@@ -4,51 +4,51 @@
 [![Shell](https://img.shields.io/badge/Shell-Bash-green.svg)](https://www.gnu.org/software/bash/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/ryantsou/netops-automation-toolkit/graphs/commit-activity)
 
-Suite complète d'outils shell professionnels pour administrateurs réseau. Conçu pour simplifier les tâches quotidiennes de monitoring, sécurité, automatisation et reporting.
+Complete suite of professional shell tools for network administrators. Designed to simplify daily monitoring, security, automation and reporting tasks.
 
-## 📋 Table des Matières
+## 📋 Table of Contents
 
-- [Fonctionnalités](#fonctionnalités)
+- [Features](#features)
 - [Installation](#installation)
-- [Utilisation](#utilisation)
-- [Scripts Disponibles](#scripts-disponibles)
+- [Usage](#usage)
+- [Available Scripts](#available-scripts)
 - [Configuration](#configuration)
-- [Exemples](#exemples)
-- [Contribution](#contribution)
-- [Licence](#licence)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
 
-## ✨ Fonctionnalités
+## ✨ Features
 
 ### 🔍 Monitoring
-- **Bandwidth Monitor** : Surveillance temps réel de la bande passante par interface
-- **Latency Tracker** : Monitoring continu de la latence et du jitter entre sites
-- **Service Watcher** : Surveillance des services critiques avec auto-restart
+- **Bandwidth Monitor**: Real-time bandwidth monitoring per interface
+- **Latency Tracker**: Continuous latency and jitter monitoring between sites
+- **Service Watcher**: Critical service monitoring with auto-restart
 
-### 🔐 Sécurité
-- **Firewall Analyzer** : Analyse des règles firewall et détection des failles
-- **SSL Certificate Checker** : Vérification des certificats SSL/TLS et alertes d'expiration
-- **Intrusion Detector** : Détection d'anomalies et tentatives d'intrusion
+### 🔐 Security
+- **Firewall Analyzer**: Firewall rule analysis and vulnerability detection
+- **SSL Certificate Checker**: SSL/TLS certificate verification and expiration alerts
+- **Intrusion Detector**: Anomaly detection and intrusion attempts
 
-### ⚙️ Automatisation
-- **Config Backup** : Sauvegarde automatisée des configurations réseau avec versioning Git
-- **Bulk Ping** : Test de connectivité massif sur plages IP
-- **VLAN Provisioner** : Déploiement automatisé de VLANs
+### ⚙️ Automation
+- **Config Backup**: Automated network configuration backup with Git versioning
+- **Bulk Ping**: Mass connectivity testing across IP ranges
+- **VLAN Provisioner**: Automated VLAN deployment
 
 ### 📊 Reporting
-- **Network Report** : Génération de rapports réseau détaillés
-- **Compliance Checker** : Audit de conformité ISO 27001 / CIS Benchmarks
+- **Network Report**: Detailed network report generation
+- **Compliance Checker**: ISO 27001 / CIS Benchmarks compliance audit
 
 ## 🚀 Installation
 
-### Prérequis
+### Prerequisites
 
 ```bash
-# Outils requis
+# Required tools
 sudo apt-get update
 sudo apt-get install -y bash curl wget net-tools dnsutils nmap
 ```
 
-### Installation rapide
+### Quick installation
 
 ```bash
 git clone https://github.com/ryantsou/netops-automation-toolkit.git
@@ -57,87 +57,87 @@ chmod +x install.sh
 ./install.sh
 ```
 
-### Installation manuelle
+### Manual installation
 
 ```bash
 git clone https://github.com/ryantsou/netops-automation-toolkit.git
 cd netops-automation-toolkit
 chmod +x scripts/**/*.sh
 
-# Ajouter au PATH (optionnel)
+# Add to PATH (optional)
 echo 'export PATH="$PATH:$(pwd)/scripts"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## 📖 Utilisation
+## 📖 Usage
 
-### Monitoring de la bande passante
+### Bandwidth monitoring
 
 ```bash
 ./scripts/monitoring/bandwidth-monitor.sh -i eth0 -t 10
 ```
 
-### Vérification des certificats SSL
+### SSL certificate verification
 
 ```bash
 ./scripts/security/ssl-cert-checker.sh -f config/hosts.txt -d 30
 ```
 
-### Sauvegarde des configurations
+### Configuration backup
 
 ```bash
 ./scripts/automation/config-backup.sh -c config/devices.yaml
 ```
 
-### Génération de rapport réseau
+### Network report generation
 
 ```bash
 ./scripts/reporting/network-report.sh -o reports/
 ```
 
-## 📂 Scripts Disponibles
+## 📂 Available Scripts
 
 ### Monitoring
 
-| Script | Description | Paramètres |
+| Script | Description | Parameters |
 |--------|-------------|------------|
-| `bandwidth-monitor.sh` | Surveillance bande passante temps réel | `-i` interface, `-t` interval |
-| `latency-tracker.sh` | Monitoring latence multi-sites | `-f` fichier hosts, `-c` count |
-| `service-watcher.sh` | Surveillance services critiques | `-s` service, `-r` auto-restart |
+| `bandwidth-monitor.sh` | Real-time bandwidth monitoring | `-i` interface, `-t` interval |
+| `latency-tracker.sh` | Multi-site latency monitoring | `-f` hosts file, `-c` count |
+| `service-watcher.sh` | Critical service monitoring | `-s` service, `-r` auto-restart |
 
-### Sécurité
+### Security
 
-| Script | Description | Paramètres |
+| Script | Description | Parameters |
 |--------|-------------|------------|
-| `firewall-analyzer.sh` | Analyse règles firewall | `-t` type (iptables/ufw) |
-| `ssl-cert-checker.sh` | Vérification certificats SSL | `-f` hosts, `-d` days |
-| `intrusion-detector.sh` | Détection d'intrusions | `-l` log file, `-a` alert |
+| `firewall-analyzer.sh` | Firewall rule analysis | `-t` type (iptables/ufw) |
+| `ssl-cert-checker.sh` | SSL certificate verification | `-f` hosts, `-d` days |
+| `intrusion-detector.sh` | Intrusion detection | `-l` log file, `-a` alert |
 
-### Automatisation
+### Automation
 
-| Script | Description | Paramètres |
+| Script | Description | Parameters |
 |--------|-------------|------------|
-| `config-backup.sh` | Sauvegarde configs réseau | `-c` config file, `-e` encrypt |
-| `bulk-ping.sh` | Test connectivité massif | `-r` range, `-t` timeout |
-| `vlan-provisioner.sh` | Déploiement VLANs | `-v` vlan_id, `-n` name |
+| `config-backup.sh` | Network config backup | `-c` config file, `-e` encrypt |
+| `bulk-ping.sh` | Mass connectivity testing | `-r` range, `-t` timeout |
+| `vlan-provisioner.sh` | VLAN deployment | `-v` vlan_id, `-n` name |
 
 ### Reporting
 
-| Script | Description | Paramètres |
+| Script | Description | Parameters |
 |--------|-------------|------------|
-| `network-report.sh` | Rapport réseau complet | `-o` output dir, `-f` format |
-| `compliance-checker.sh` | Audit conformité | `-s` standard (iso27001/cis) |
+| `network-report.sh` | Complete network report | `-o` output dir, `-f` format |
+| `compliance-checker.sh` | Compliance audit | `-s` standard (iso27001/cis) |
 
 ## ⚙️ Configuration
 
-Les fichiers de configuration se trouvent dans le répertoire `config/`:
+Configuration files are located in the `config/` directory:
 
-- `config/devices.yaml` : Liste des équipements réseau
-- `config/hosts.txt` : Liste des hôtes à monitorer
-- `config/alerts.conf` : Configuration des alertes
-- `config/templates/` : Templates de configuration
+- `config/devices.yaml`: Network equipment list
+- `config/hosts.txt`: Hosts to monitor
+- `config/alerts.conf`: Alert configuration
+- `config/templates/`: Configuration templates
 
-### Exemple de configuration (devices.yaml)
+### Configuration example (devices.yaml)
 
 ```yaml
 devices:
@@ -156,47 +156,47 @@ devices:
       method: password
 ```
 
-## 💡 Exemples
+## 💡 Examples
 
-### Monitoring complet d'une infrastructure
+### Complete infrastructure monitoring
 
 ```bash
-# Terminal 1 : Monitoring bande passante
+# Terminal 1: Bandwidth monitoring
 ./scripts/monitoring/bandwidth-monitor.sh -i eth0 -t 5 &
 
-# Terminal 2 : Monitoring latence
+# Terminal 2: Latency monitoring
 ./scripts/monitoring/latency-tracker.sh -f config/hosts.txt -c 100 &
 
-# Terminal 3 : Surveillance services
+# Terminal 3: Service monitoring
 ./scripts/monitoring/service-watcher.sh -s "nginx apache2 mysql" -r
 ```
 
-### Audit de sécurité automatisé
+### Automated security audit
 
 ```bash
-# Vérification certificats SSL
+# SSL certificate verification
 ./scripts/security/ssl-cert-checker.sh -f config/hosts.txt -d 30
 
-# Analyse firewall
+# Firewall analysis
 ./scripts/security/firewall-analyzer.sh -t iptables
 
-# Génération rapport de conformité
+# Compliance report generation
 ./scripts/reporting/compliance-checker.sh -s iso27001 -o reports/
 ```
 
-### Backup automatisé quotidien (cron)
+### Daily automated backup (cron)
 
 ```bash
-# Ajouter au crontab
+# Add to crontab
 crontab -e
 
-# Backup quotidien à 2h du matin
+# Daily backup at 2 AM
 0 2 * * * /path/to/netops-automation-toolkit/scripts/automation/config-backup.sh -c /path/to/config/devices.yaml -e
 ```
 
-## 🔧 Développement
+## 🔧 Development
 
-### Structure du projet
+### Project structure
 
 ```
 netops-automation-toolkit/
@@ -217,59 +217,59 @@ netops-automation-toolkit/
 ### Tests
 
 ```bash
-# Lancer les tests
+# Run tests
 ./tests/run_tests.sh
 ```
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-Les contributions sont les bienvenues ! Voici comment contribuer :
+Contributions are welcome! Here's how to contribute:
 
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+1. Fork the project
+2. Create a branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ### Guidelines
 
-- Suivre les conventions de codage shell (ShellCheck)
-- Ajouter des commentaires clairs
-- Tester les scripts avant soumission
-- Mettre à jour la documentation
+- Follow shell coding conventions (ShellCheck)
+- Add clear comments
+- Test scripts before submission
+- Update documentation
 
 ## 📝 Roadmap
 
-- [ ] Support SD-WAN monitoring
-- [ ] Intégration Prometheus/Grafana
-- [ ] Dashboard web interactif
-- [ ] Support multi-vendor (Cisco, Juniper, HP, Arista)
-- [ ] Module 5G network slicing
-- [ ] API REST pour intégration externe
-- [ ] Machine Learning pour détection d'anomalies
+- [ ] SD-WAN monitoring support
+- [ ] Prometheus/Grafana integration
+- [ ] Interactive web dashboard
+- [ ] Multi-vendor support (Cisco, Juniper, HP, Arista)
+- [ ] 5G network slicing module
+- [ ] REST API for external integration
+- [ ] Machine Learning for anomaly detection
 
-## 📄 Licence
+## 📄 License
 
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Auteur
+## 👨‍💻 Author
 
 **Riantsoa Rajhonson** - [@ryantsou](https://github.com/ryantsou)
 
-Étudiant en Network & IT Engineering @ Polytech Dijon
+Network & IT Engineering Student @ Polytech Dijon
 
-## 🙏 Remerciements
+## 🙏 Acknowledgments
 
-- Communauté open-source
+- Open-source community
 - Polytech Dijon
-- Contributeurs du projet
+- Project contributors
 
 ## 📞 Support
 
-Pour toute question ou suggestion :
-- Ouvrir une [issue](https://github.com/ryantsou/netops-automation-toolkit/issues)
-- Me contacter via [LinkedIn](https://linkedin.com)
+For questions or suggestions:
+- Open an [issue](https://github.com/ryantsou/netops-automation-toolkit/issues)
+- Contact me via [LinkedIn](https://linkedin.com)
 
 ---
 
-⭐ Si ce projet vous aide, n'hésitez pas à lui donner une étoile !
+⭐ If this project helps you, don't hesitate to give it a star!
