@@ -1,0 +1,125 @@
+#!/bin/bash
+
+# NetOps Automation Toolkit - Installation Script
+# Author: Riantsoa Rajhonson
+# Description: Installation automatisée du toolkit
+
+set -e
+
+COLOR_GREEN="\033[0;32m"
+COLOR_YELLOW="\033[1;33m"
+COLOR_RED="\033[0;31m"
+COLOR_RESET="\033[0m"
+
+echo -e "${COLOR_GREEN}╔═══════════════════════════════════════════╗${COLOR_RESET}"
+echo -e "${COLOR_GREEN}║  NetOps Automation Toolkit - Installer  ║${COLOR_RESET}"
+echo -e "${COLOR_GREEN}╚═══════════════════════════════════════════╝${COLOR_RESET}"
+echo ""
+
+# Vérifier les prérequis
+echo -e "${COLOR_YELLOW}[1/5]${COLOR_RESET} Vérification des prérequis..."
+
+check_command() {
+    if command -v $1 &> /dev/null; then
+        echo -e "  ✓ $1 installé"
+    else
+        echo -e "  ${COLOR_RED}✗ $1 manquant${COLOR_RESET}"
+        MISSING_DEPS="$MISSING_DEPS $1"
+    fi
+}
+
+MISSING_DEPS=""
+check_command bash
+check_command curl
+check_command wget
+check_command ping
+check_command nslookup
+check_command netstat
+
+if [ ! -z "$MISSING_DEPS" ]; then
+    echo -e "${COLOR_RED}Erreur: Dépendances manquantes:$MISSING_DEPS${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Installez-les avec: sudo apt-get install$MISSING_DEPS${COLOR_RESET}"
+    exit 1
+fi
+
+# Créer les répertoires
+echo -e "${COLOR_YELLOW}[2/5]${COLOR_RESET} Création de la structure des répertoires..."
+mkdir -p config/templates
+mkdir -p logs
+mkdir -p reports
+mkdir -p tests
+mkdir -p docs
+echo -e "  ✓ Répertoires créés"
+
+# Rendre les scripts exécutables
+echo -e "${COLOR_YELLOW}[3/5]${COLOR_RESET} Configuration des permissions..."
+find scripts -type f -name "*.sh" -exec chmod +x {} \;
+echo -e "  ✓ Permissions configurées"
+
+# Créer les fichiers de configuration par défaut
+echo -e "${COLOR_YELLOW}[4/5]${COLOR_RESET} Création des fichiers de configuration..."
+
+if [ ! -f config/hosts.txt ]; then
+    cat > config/hosts.txt <<EOF
+# Liste des hôtes à monitorer
+# Format: IP ou hostname (un par ligne)
+8.8.8.8
+1.1.1.1
+EOF
+    echo -e "  ✓ config/hosts.txt créé"
+fi
+
+if [ ! -f config/alerts.conf ]; then
+    cat > config/alerts.conf <<EOF
+# Configuration des alertes
+EMAIL_ALERT=false
+EMAIL_TO="admin@example.com"
+SLACK_WEBHOOK=""
+ALERT_THRESHOLD_CPU=80
+ALERT_THRESHOLD_MEM=85
+ALERT_THRESHOLD_DISK=90
+EOF
+    echo -e "  ✓ config/alerts.conf créé"
+fi
+
+# Ajouter au PATH (optionnel)
+echo -e "${COLOR_YELLOW}[5/5]${COLOR_RESET} Configuration du PATH (optionnel)..."
+echo ""
+echo -e "${COLOR_YELLOW}Voulez-vous ajouter les scripts au PATH? (y/n)${COLOR_RESET}"
+read -r response
+
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    TOOLKIT_PATH=$(pwd)
+    SHELL_RC="$HOME/.bashrc"
+    
+    if [[ "$SHELL" == *"zsh"* ]]; then
+        SHELL_RC="$HOME/.zshrc"
+    fi
+    
+    if ! grep -q "netops-automation-toolkit" "$SHELL_RC"; then
+        echo "" >> "$SHELL_RC"
+        echo "# NetOps Automation Toolkit" >> "$SHELL_RC"
+        echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/monitoring\"" >> "$SHELL_RC"
+        echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/security\"" >> "$SHELL_RC"
+        echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/automation\"" >> "$SHELL_RC"
+        echo "export PATH=\"\$PATH:$TOOLKIT_PATH/scripts/reporting\"" >> "$SHELL_RC"
+        echo -e "  ✓ PATH ajouté à $SHELL_RC"
+        echo -e "  ${COLOR_YELLOW}Exécutez: source $SHELL_RC${COLOR_RESET}"
+    else
+        echo -e "  ${COLOR_YELLOW}PATH déjà configuré${COLOR_RESET}"
+    fi
+else
+    echo -e "  ⊗ PATH non modifié"
+fi
+
+echo ""
+echo -e "${COLOR_GREEN}╔═══════════════════════════════════════════╗${COLOR_RESET}"
+echo -e "${COLOR_GREEN}║     Installation terminée avec succès!   ║${COLOR_RESET}"
+echo -e "${COLOR_GREEN}╚═══════════════════════════════════════════╝${COLOR_RESET}"
+echo ""
+echo -e "${COLOR_YELLOW}Prochaines étapes:${COLOR_RESET}"
+echo "  1. Éditer les fichiers de configuration dans config/"
+echo "  2. Tester un script: ./scripts/monitoring/bandwidth-monitor.sh --help"
+echo "  3. Consulter la documentation: cat README.md"
+echo ""
+echo -e "${COLOR_GREEN}Happy networking! 🚀${COLOR_RESET}"
