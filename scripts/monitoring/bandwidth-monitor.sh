@@ -1,39 +1,39 @@
 #!/bin/bash
 
-# Bandwidth Monitor - Surveillance de la bande passante en temps réel
+# Bandwidth Monitor - Real-time bandwidth monitoring
 # Author: Riantsoa Rajhonson
 # Usage: ./bandwidth-monitor.sh -i <interface> -t <interval>
 
 set -euo pipefail
 
-# Couleurs pour l'affichage
+# Colors for display
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Variables par défaut
+# Default variables
 INTERFACE="eth0"
 INTERVAL=5
 LOG_FILE="logs/bandwidth.log"
-ALERT_THRESHOLD=80 # Pourcentage
+ALERT_THRESHOLD=80 # Percentage
 
-# Fonction d'aide
+# Help function
 show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Surveillance de la bande passante réseau en temps réel.
+Real-time network bandwidth monitoring.
 
 OPTIONS:
-    -i, --interface <name>    Interface réseau à monitorer (défaut: eth0)
-    -t, --interval <seconds>  Intervalle de rafraîchissement (défaut: 5s)
-    -l, --log <file>          Fichier de log (défaut: logs/bandwidth.log)
-    -a, --alert <percent>     Seuil d'alerte en % (défaut: 80)
-    -h, --help                Afficher cette aide
+    -i, --interface <name>    Network interface to monitor (default: eth0)
+    -t, --interval <seconds>  Refresh interval (default: 5s)
+    -l, --log <file>          Log file (default: logs/bandwidth.log)
+    -a, --alert <percent>     Alert threshold in % (default: 80)
+    -h, --help                Display this help
 
-EXEMPLES:
+EXAMPLES:
     $(basename "$0") -i eth0 -t 10
     $(basename "$0") -i wlan0 -t 5 -a 90
 
@@ -42,49 +42,30 @@ AUTHOR:
 EOF
 }
 
-# Parser les arguments
+# Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -i|--interface)
-            INTERFACE="$2"
-            shift 2
-            ;;
-        -t|--interval)
-            INTERVAL="$2"
-            shift 2
-            ;;
-        -l|--log)
-            LOG_FILE="$2"
-            shift 2
-            ;;
-        -a|--alert)
-            ALERT_THRESHOLD="$2"
-            shift 2
-            ;;
-        -h|--help)
-            show_help
-            exit 0
-            ;;
-        *)
-            echo -e "${RED}Erreur: Option inconnue: $1${NC}"
-            show_help
-            exit 1
-            ;;
+        -i|--interface) INTERFACE="$2"; shift 2 ;;
+        -t|--interval) INTERVAL="$2"; shift 2 ;;
+        -l|--log) LOG_FILE="$2"; shift 2 ;;
+        -a|--alert) ALERT_THRESHOLD="$2"; shift 2 ;;
+        -h|--help) show_help; exit 0 ;;
+        *) echo -e "${RED}Error: Unknown option: $1${NC}"; show_help; exit 1 ;;
     esac
 done
 
-# Vérifier que l'interface existe
+# Check if interface exists
 if ! ip link show "$INTERFACE" &> /dev/null; then
-    echo -e "${RED}Erreur: Interface $INTERFACE introuvable${NC}"
-    echo -e "${YELLOW}Interfaces disponibles:${NC}"
+    echo -e "${RED}Error: Interface $INTERFACE not found${NC}"
+    echo -e "${YELLOW}Available interfaces:${NC}"
     ip -br link show | awk '{print "  - " $1}'
     exit 1
 fi
 
-# Créer le répertoire de logs si nécessaire
+# Create log directory if needed
 mkdir -p "$(dirname "$LOG_FILE")"
 
-# Fonction pour obtenir les statistiques réseau
+# Function to get network statistics
 get_stats() {
     local interface=$1
     local rx_bytes=$(cat /sys/class/net/$interface/statistics/rx_bytes 2>/dev/null || echo 0)
@@ -92,7 +73,7 @@ get_stats() {
     echo "$rx_bytes $tx_bytes"
 }
 
-# Fonction pour formater les bytes
+# Function to format bytes
 format_bytes() {
     local bytes=$1
     if (( bytes > 1073741824 )); then
@@ -106,7 +87,7 @@ format_bytes() {
     fi
 }
 
-# Fonction pour afficher une barre de progression
+# Function to display progress bar
 show_bar() {
     local percent=$1
     local width=50
@@ -122,39 +103,39 @@ show_bar() {
 echo -e "${BLUE}╔═══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║           Bandwidth Monitor - Interface: $INTERFACE          ║${NC}"
 echo -e "${BLUE}╚═══════════════════════════════════════════════════════════════╝${NC}"
-echo -e "${YELLOW}Intervalle: ${INTERVAL}s | Seuil d'alerte: ${ALERT_THRESHOLD}%${NC}"
-echo -e "${YELLOW}Appuyez sur Ctrl+C pour arrêter${NC}"
+echo -e "${YELLOW}Interval: ${INTERVAL}s | Alert threshold: ${ALERT_THRESHOLD}%${NC}"
+echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
 echo ""
 
-# Obtenir les statistiques initiales
+# Get initial statistics
 read rx_prev tx_prev <<< $(get_stats "$INTERFACE")
 sleep 1
 
-# Boucle principale
+# Main loop
 while true; do
-    # Obtenir les nouvelles statistiques
+    # Get new statistics
     read rx_curr tx_curr <<< $(get_stats "$INTERFACE")
     
-    # Calculer les débits
+    # Calculate rates
     rx_rate=$(( (rx_curr - rx_prev) / INTERVAL ))
     tx_rate=$(( (tx_curr - tx_prev) / INTERVAL ))
     
-    # Sauvegarder les valeurs actuelles
+    # Save current values
     rx_prev=$rx_curr
     tx_prev=$tx_curr
     
-    # Obtenir la capacité max de l'interface (en supposant 1 Gbps)
+    # Get max interface capacity (assuming 1 Gbps)
     max_bandwidth=125000000 # 1 Gbps = 125 MB/s
     
-    # Calculer les pourcentages
+    # Calculate percentages
     rx_percent=$(( rx_rate * 100 / max_bandwidth ))
     tx_percent=$(( tx_rate * 100 / max_bandwidth ))
     
-    # Limiter à 100%
+    # Cap at 100%
     [[ $rx_percent -gt 100 ]] && rx_percent=100
     [[ $tx_percent -gt 100 ]] && tx_percent=100
     
-    # Affichage
+    # Display
     clear
     echo -e "${BLUE}╔═══════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║           Bandwidth Monitor - Interface: $INTERFACE          ║${NC}"
@@ -174,16 +155,16 @@ while true; do
     echo "  RX Total: $(format_bytes $rx_curr) | TX Total: $(format_bytes $tx_curr)"
     echo ""
     
-    # Alertes
+    # Alerts
     if [[ $rx_percent -ge $ALERT_THRESHOLD ]] || [[ $tx_percent -ge $ALERT_THRESHOLD ]]; then
-        echo -e "${RED}⚠ ALERTE: Utilisation élevée de la bande passante!${NC}"
+        echo -e "${RED}⚠ ALERT: High bandwidth usage!${NC}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - ALERT: RX=$rx_percent% TX=$tx_percent%" >> "$LOG_FILE"
     fi
     
-    echo -e "${YELLOW}Dernière mise à jour: $(date '+%H:%M:%S')${NC}"
-    echo -e "${YELLOW}Appuyez sur Ctrl+C pour arrêter${NC}"
+    echo -e "${YELLOW}Last update: $(date '+%H:%M:%S')${NC}"
+    echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
     
-    # Logger les données
+    # Log data
     echo "$(date '+%Y-%m-%d %H:%M:%S'),$rx_rate,$tx_rate,$rx_percent,$tx_percent" >> "$LOG_FILE"
     
     sleep "$INTERVAL"

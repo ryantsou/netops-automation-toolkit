@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Latency Tracker - Monitoring de latence multi-sites
+# Latency Tracker - Multi-site latency monitoring
 # Author: Riantsoa Rajhonson
 # Usage: ./latency-tracker.sh -f <hosts_file> -c <count>
 
@@ -22,21 +22,21 @@ show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Monitoring de latence et jitter entre plusieurs sites.
+Latency and jitter monitoring between multiple sites.
 
 OPTIONS:
-    -f, --file <path>         Fichier contenant les hôtes à monitorer
-    -c, --count <number>      Nombre de pings par hôte (défaut: 10)
-    -i, --interval <seconds>  Intervalle entre les tests (défaut: 1s)
-    -l, --log <file>          Fichier de log CSV
-    -a, --alert <ms>          Seuil d'alerte en millisecondes (défaut: 100)
-    -h, --help                Afficher cette aide
+    -f, --file <path>         File containing hosts to monitor
+    -c, --count <number>      Number of pings per host (default: 10)
+    -i, --interval <seconds>  Interval between tests (default: 1s)
+    -l, --log <file>          CSV log file
+    -a, --alert <ms>          Alert threshold in milliseconds (default: 100)
+    -h, --help                Display this help
 
-FORMAT DU FICHIER HOSTS:
-    hostname ou IP par ligne
-    Exemple: 8.8.8.8
+HOSTS FILE FORMAT:
+    hostname or IP per line
+    Example: 8.8.8.8
 
-EXEMPLES:
+EXAMPLES:
     $(basename "$0") -f config/hosts.txt -c 20
     $(basename "$0") -f sites.txt -c 50 -a 150
 
@@ -53,12 +53,12 @@ while [[ $# -gt 0 ]]; do
         -l|--log) LOG_FILE="$2"; shift 2 ;;
         -a|--alert) ALERT_THRESHOLD="$2"; shift 2 ;;
         -h|--help) show_help; exit 0 ;;
-        *) echo -e "${RED}Erreur: Option inconnue: $1${NC}"; show_help; exit 1 ;;
+        *) echo -e "${RED}Error: Unknown option: $1${NC}"; show_help; exit 1 ;;
     esac
 done
 
 if [[ ! -f "$HOSTS_FILE" ]]; then
-    echo -e "${RED}Erreur: Fichier $HOSTS_FILE introuvable${NC}"
+    echo -e "${RED}Error: File $HOSTS_FILE not found${NC}"
     exit 1
 fi
 
@@ -69,7 +69,7 @@ echo -e "${BLUE}║              Latency Tracker - Multi-Site Monitor          �
 echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
-# Initialiser le fichier CSV
+# Initialize CSV file
 if [[ ! -f "$LOG_FILE" ]]; then
     echo "timestamp,host,min_ms,avg_ms,max_ms,stddev_ms,packet_loss,status" > "$LOG_FILE"
 fi
@@ -80,7 +80,7 @@ ping_host() {
     
     echo -e "${YELLOW}Testing: $host${NC}"
     
-    # Exécuter ping et capturer les résultats
+    # Execute ping and capture results
     local ping_output=$(ping -c "$count" -i "$INTERVAL" -W 2 "$host" 2>&1)
     local exit_code=$?
     
@@ -90,7 +90,7 @@ ping_host() {
         return 1
     fi
     
-    # Parser les statistiques
+    # Parse statistics
     local stats=$(echo "$ping_output" | grep "rtt min/avg/max/mdev")
     local packet_loss=$(echo "$ping_output" | grep "packet loss" | awk '{print $6}' | tr -d '%')
     
@@ -100,13 +100,13 @@ ping_host() {
         local max=$(echo "$stats" | awk -F'[/=]' '{print $8}')
         local stddev=$(echo "$stats" | awk -F'[/=]' '{print $9}' | awk '{print $1}')
         
-        # Arrondir les valeurs
+        # Round values
         min=$(printf "%.0f" "$min")
         avg=$(printf "%.0f" "$avg")
         max=$(printf "%.0f" "$max")
         stddev=$(printf "%.0f" "$stddev")
         
-        # Déterminer le status
+        # Determine status
         local status="OK"
         local color=$GREEN
         if (( $(echo "$avg > $ALERT_THRESHOLD" | bc -l) )); then
@@ -125,14 +125,14 @@ ping_host() {
             echo -e "  ${RED}⚠ ALERT: $status${NC}"
         fi
         
-        # Logger
+        # Log
         echo "$(date '+%Y-%m-%d %H:%M:%S'),$host,$min,$avg,$max,$stddev,$packet_loss,$status" >> "$LOG_FILE"
     fi
     
     echo ""
 }
 
-# Boucle principale
+# Main loop
 while true; do
     clear
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -147,6 +147,6 @@ while true; do
         ping_host "$host" "$COUNT"
     done < "$HOSTS_FILE"
     
-    echo -e "${YELLOW}Appuyez sur Ctrl+C pour arrêter${NC}"
+    echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
     sleep 10
 done
