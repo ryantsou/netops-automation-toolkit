@@ -67,6 +67,13 @@ if [[ ! -f "$HOSTS_FILE" ]]; then
     exit 1
 fi
 
+for cmd in openssl timeout date; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Required command not found: $cmd${NC}"
+        exit 1
+    fi
+done
+
 # Créer le répertoire de rapports
 mkdir -p "$(dirname "$REPORT_FILE")"
 
@@ -107,7 +114,7 @@ check_cert() {
     if [[ -z "$cert_info" ]]; then
         echo -e "  ${RED}✗ Erreur de connexion ou certificat invalide${NC}"
         echo "$host:$port - ERROR: Cannot retrieve certificate" >> "$REPORT_FILE"
-        ((errors++))
+          errors=$((errors + 1))
         return 1
     fi
     
@@ -121,15 +128,15 @@ check_cert() {
     if [[ $days_left -lt 0 ]]; then
         echo -e "  ${RED}✗ EXPIRÉ depuis ${days_left#-} jours${NC}"
         echo "$host:$port - EXPIRED: $expiry_date (${days_left} days ago)" >> "$REPORT_FILE"
-        ((expired++))
+          expired=$((expired + 1))
     elif [[ $days_left -le $WARNING_DAYS ]]; then
         echo -e "  ${YELLOW}⚠ ATTENTION: Expire dans $days_left jours ($expiry_date)${NC}"
         echo "$host:$port - WARNING: Expires in $days_left days ($expiry_date)" >> "$REPORT_FILE"
-        ((expiring++))
+          expiring=$((expiring + 1))
     else
         echo -e "  ${GREEN}✓ Valide: Expire dans $days_left jours ($expiry_date)${NC}"
         echo "$host:$port - OK: Expires in $days_left days ($expiry_date)" >> "$REPORT_FILE"
-        ((valid++))
+          valid=$((valid + 1))
     fi
     
     echo ""
@@ -140,7 +147,7 @@ while IFS= read -r host || [[ -n "$host" ]]; do
     # Ignorer les lignes vides et les commentaires
     [[ -z "$host" || "$host" =~ ^# ]] && continue
     
-    ((total++))
+    total=$((total + 1))
     check_cert "$host" "$PORT"
 done < "$HOSTS_FILE"
 

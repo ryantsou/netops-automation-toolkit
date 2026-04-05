@@ -108,6 +108,12 @@ elif [[ -n "$FILE" ]]; then
 fi
 
 total_hosts=${#ip_list[@]}
+
+if [[ $total_hosts -eq 0 ]]; then
+    echo -e "${RED}Error: No hosts to scan. Check your range or input file.${NC}"
+    exit 1
+fi
+
 echo -e "${BLUE}Total hosts to scan: $total_hosts${NC}"
 echo -e "${YELLOW}Threads: $THREADS | Timeout: ${TIMEOUT}s${NC}"
 echo ""

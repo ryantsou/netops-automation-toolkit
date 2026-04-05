@@ -19,6 +19,14 @@ ENCRYPTION_KEY=""
 GIT_ENABLED=true
 MAX_BACKUPS=30
 
+require_command() {
+    local cmd=$1
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Required command not found: $cmd${NC}"
+        exit 1
+    fi
+}
+
 show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -72,6 +80,8 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 1
 fi
 
+require_command awk
+
 if [[ "$ENCRYPT" == true && -z "$ENCRYPTION_KEY" ]]; then
     echo -e "${YELLOW}Clé de chiffrement requise. Entrez la passphrase:${NC}"
     read -s ENCRYPTION_KEY
@@ -100,6 +110,33 @@ fi
 
 success_count=0
 fail_count=0
+
+parse_devices_from_yaml() {
+    awk '
+        $1 == "devices:" {in_devices=1; next}
+        in_devices && $1 == "global_settings:" {in_devices=0}
+        in_devices && $1 == "-" && $2 == "name:" {
+            name=$3
+            gsub(/\"/, "", name)
+            next
+        }
+        in_devices && $1 == "ip:" {
+            ip=$2
+            gsub(/\"/, "", ip)
+            next
+        }
+        in_devices && $1 == "type:" {
+            type=$2
+            gsub(/\"/, "", type)
+            if (name != "" && ip != "" && type != "") {
+                print name ":" ip ":" type
+            }
+            name=""
+            ip=""
+            type=""
+        }
+    ' "$CONFIG_FILE"
+}
 
 # Fonction pour sauvegarder un device
 backup_device() {
@@ -137,18 +174,23 @@ backup_device() {
     if [[ -f "$backup_file" ]]; then
         # Chiffrer si demandé
         if [[ "$ENCRYPT" == true ]]; then
+            require_command openssl
             echo -e "  ${BLUE}Encrypting backup...${NC}"
-            openssl enc -aes-256-cbc -salt -in "$backup_file" -out "${backup_file}.enc" -k "$ENCRYPTION_KEY" 2>/dev/null
+            if ! openssl enc -aes-256-cbc -salt -in "$backup_file" -out "${backup_file}.enc" -k "$ENCRYPTION_KEY" 2>/dev/null; then
+                echo -e "  ${RED}✗ Backup encryption failed${NC}"
+                fail_count=$((fail_count + 1))
+                return 1
+            fi
             rm "$backup_file"
             backup_file="${backup_file}.enc"
         fi
         
         echo -e "  ${GREEN}✓ Backup saved: $(basename "$backup_file")${NC}"
-        ((success_count++))
+        success_count=$((success_count + 1))
         return 0
     else
         echo -e "  ${RED}✗ Backup failed${NC}"
-        ((fail_count++))
+        fail_count=$((fail_count + 1))
         return 1
     fi
 }
@@ -158,12 +200,12 @@ backup_device() {
 echo -e "${BLUE}Processing devices...${NC}"
 echo ""
 
-# Exemple de devices (normalement parsé depuis YAML)
-devices=(
-    "core-switch-01:192.168.1.1:cisco"
-    "edge-router-01:10.0.0.1:juniper"
-    "access-switch-01:192.168.1.10:cisco"
-)
+mapfile -t devices < <(parse_devices_from_yaml)
+
+if [[ ${#devices[@]} -eq 0 ]]; then
+    echo -e "${RED}Error: No devices found in $CONFIG_FILE${NC}"
+    exit 1
+fi
 
 for device in "${devices[@]}"; do
     IFS=':' read -r name ip type <<< "$device"
@@ -173,6 +215,7 @@ done
 
 # Commit Git si activé
 if [[ "$GIT_ENABLED" == true && $success_count -gt 0 ]]; then
+    require_command git
     echo -e "${BLUE}Committing to Git...${NC}"
     (
         cd "$(dirname "$BACKUP_DIR")"

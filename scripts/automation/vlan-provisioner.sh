@@ -121,7 +121,7 @@ configure_vlan() {
     if ! ping -c 1 -W 2 "$switch" &>/dev/null; then
         echo -e "  ${RED}✗ Switch unreachable${NC}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - ERROR: $switch unreachable" >> "$LOG_FILE"
-        ((fail_count++))
+          fail_count=$((fail_count + 1))
         return 1
     fi
     
@@ -147,7 +147,7 @@ configure_vlan() {
         
         echo -e "  ${GREEN}✓ VLAN configured successfully${NC}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - SUCCESS: VLAN $VLAN_ID configured on $switch" >> "$LOG_FILE"
-        ((success_count++))
+          success_count=$((success_count + 1))
     else
         # Mode dry-run
         echo -e "  ${BLUE}[DRY-RUN] Would configure:${NC}"
@@ -157,7 +157,7 @@ configure_vlan() {
             echo "    - Configure subnet $SUBNET"
         fi
         echo "    - Save configuration"
-        ((success_count++))
+          success_count=$((success_count + 1))
     fi
     
     return 0

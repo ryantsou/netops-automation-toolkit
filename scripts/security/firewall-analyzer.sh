@@ -22,7 +22,7 @@ Usage: $(basename "$0") [OPTIONS]
 Analyse des règles firewall et détection de failles de sécurité.
 
 OPTIONS:
-    -t, --type <type>         Type de firewall (iptables/ufw/nftables)
+    -t, --type <type>         Type de firewall (iptables/ufw)
     -o, --output <file>       Fichier de rapport
     -h, --help                Afficher cette aide
 
@@ -82,7 +82,7 @@ if [[ "$FW_TYPE" == "iptables" ]]; then
         echo "$permissive_rules"
         echo -e "\nPERMISSIVE RULES DETECTED:" >> "$REPORT_FILE"
         echo "$permissive_rules" >> "$REPORT_FILE"
-        ((issues_found++))
+          issues_found=$((issues_found + 1))
     else
         echo -e "${GREEN}✓ No permissive rules detected${NC}"
     fi
@@ -94,7 +94,7 @@ if [[ "$FW_TYPE" == "iptables" ]]; then
         if sudo iptables -L -n | grep -q "dpt:$port"; then
             echo -e "${RED}⚠ Warning: Dangerous port $port is open${NC}"
             echo "DANGEROUS PORT OPEN: $port" >> "$REPORT_FILE"
-            ((issues_found++))
+              issues_found=$((issues_found + 1))
         fi
     done
     
@@ -104,7 +104,7 @@ if [[ "$FW_TYPE" == "iptables" ]]; then
     if [[ "$default_policy" == "ACCEPT)" ]]; then
         echo -e "${RED}⚠ Warning: Default INPUT policy is ACCEPT (should be DROP)${NC}"
         echo "DEFAULT POLICY WARNING: INPUT chain default is ACCEPT" >> "$REPORT_FILE"
-        ((issues_found++))
+          issues_found=$((issues_found + 1))
     else
         echo -e "${GREEN}✓ Default policy is secure: $default_policy${NC}"
     fi

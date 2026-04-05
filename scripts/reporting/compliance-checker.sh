@@ -96,16 +96,16 @@ run_check() {
     if eval "$check_command" &>/dev/null; then
         echo -e "${GREEN}PASS${NC}"
         echo "[PASS] $check_name" >> "$REPORT_FILE"
-        ((passed++))
+          passed=$((passed + 1))
     else
         if [[ "$severity" == "critical" ]]; then
             echo -e "${RED}FAIL${NC}"
             echo "[FAIL] $check_name" >> "$REPORT_FILE"
-            ((failed++))
+              failed=$((failed + 1))
         else
             echo -e "${YELLOW}WARN${NC}"
             echo "[WARN] $check_name" >> "$REPORT_FILE"
-            ((warnings++))
+              warnings=$((warnings + 1))
         fi
     fi
 }

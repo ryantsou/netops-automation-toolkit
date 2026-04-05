@@ -4,7 +4,7 @@
 # Author: Riantsoa Rajhonson
 # Description: Automated toolkit installation
 
-set -e
+set -euo pipefail
 
 COLOR_GREEN="\033[0;32m"
 COLOR_YELLOW="\033[1;33m"
@@ -20,7 +20,7 @@ echo ""
 echo -e "${COLOR_YELLOW}[1/5]${COLOR_RESET} Checking prerequisites..."
 
 check_command() {
-    if command -v $1 &> /dev/null; then
+    if command -v "$1" &> /dev/null; then
         echo -e "  ✓ $1 installed"
     else
         echo -e "  ${COLOR_RED}✗ $1 missing${COLOR_RESET}"
@@ -33,8 +33,12 @@ check_command bash
 check_command curl
 check_command wget
 check_command ping
+check_command ip
 check_command nslookup
 check_command netstat
+check_command bc
+check_command openssl
+check_command timeout
 
 if [ ! -z "$MISSING_DEPS" ]; then
     echo -e "${COLOR_RED}Error: Missing dependencies:$MISSING_DEPS${COLOR_RESET}"

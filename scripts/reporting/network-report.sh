@@ -23,11 +23,11 @@ show_help() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Génération de rapports réseau complets et détaillés.
+Génération de rapports réseau complets et détaillés au format texte.
 
 OPTIONS:
     -o, --output <dir>        Répertoire de sortie (défaut: reports/)
-    -f, --format <type>       Format de sortie (text/html/json)
+    -f, --format <type>       Format de sortie (text)
     -n, --name <name>         Nom du rapport
     --no-system               Exclure les infos système
     --no-network              Exclure les infos réseau
@@ -44,8 +44,8 @@ SECTIONS DU RAPPORT:
     - Alertes et anomalies
 
 EXEMPLES:
-    $(basename "$0") -o reports/ -f html
-    $(basename "$0") --no-security -f json
+    $(basename "$0") -o reports/ -f text
+    $(basename "$0") --no-security
 
 AUTHOR:
     Riantsoa Rajhonson - NetOps Automation Toolkit
@@ -64,6 +64,11 @@ while [[ $# -gt 0 ]]; do
         *) echo -e "${RED}Erreur: Option inconnue: $1${NC}"; show_help; exit 1 ;;
     esac
 done
+
+if [[ "$FORMAT" != "text" ]]; then
+    echo -e "${RED}Error: Unsupported format '$FORMAT'. Only 'text' is currently implemented.${NC}"
+    exit 1
+fi
 
 mkdir -p "$OUTPUT_DIR"
 
