@@ -93,7 +93,7 @@ if [[ -n "$failed_ssh" ]]; then
         if [[ $count -ge $MAX_FAILED_ATTEMPTS ]]; then
             echo -e "${RED}⚠ ALERT: $count failed SSH attempts from $ip${NC}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - HIGH: $count failed SSH attempts from $ip" >> "$ALERT_FILE"
-            ((threats_found++))
+              threats_found=$((threats_found + 1))
         fi
     done
 fi
@@ -106,7 +106,7 @@ if [[ -n "$root_logins" ]]; then
     echo -e "${YELLOW}⚠ Warning: Root login detected:${NC}"
     echo "$root_logins" | tail -5
     echo "$(date '+%Y-%m-%d %H:%M:%S') - MEDIUM: Root login detected" >> "$ALERT_FILE"
-    ((threats_found++))
+    threats_found=$((threats_found + 1))
 fi
 
 # 3. Détecter les commandes sudo suspectes
@@ -118,7 +118,7 @@ for cmd in "${suspicious_sudo[@]}"; do
     if echo "$sudo_commands" | grep -q "$cmd"; then
         echo -e "${RED}⚠ ALERT: Suspicious sudo command detected: $cmd${NC}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - HIGH: Suspicious sudo command: $cmd" >> "$ALERT_FILE"
-        ((threats_found++))
+          threats_found=$((threats_found + 1))
     fi
 done
 
@@ -144,7 +144,7 @@ for file in "${critical_files[@]}"; do
         if [[ $age -lt 86400 ]]; then # Modifié dans les dernières 24h
             echo -e "${YELLOW}⚠ Warning: $file was modified recently ($(date -d @$mod_time '+%Y-%m-%d %H:%M'))${NC}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - MEDIUM: Critical file modified: $file" >> "$ALERT_FILE"
-            ((threats_found++))
+              threats_found=$((threats_found + 1))
         fi
     fi
 done

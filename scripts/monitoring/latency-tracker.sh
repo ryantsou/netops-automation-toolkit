@@ -62,6 +62,13 @@ if [[ ! -f "$HOSTS_FILE" ]]; then
     exit 1
 fi
 
+for cmd in ping awk bc; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Required command not found: $cmd${NC}"
+        exit 1
+    fi
+done
+
 mkdir -p "$(dirname "$LOG_FILE")"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"

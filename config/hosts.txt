@@ -1,0 +1,5 @@
+# Hosts list for monitoring and SSL checks
+# One hostname or IP per line
+8.8.8.8
+1.1.1.1
+example.com
